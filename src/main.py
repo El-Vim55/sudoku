@@ -144,7 +144,7 @@ if __name__ == '__main__':
                 # Update cell selection and editing
                 for cell in grid_sprite:
                     cell.selected = (cell.row == selected_row and cell.col == selected_col)
-                    cell.editing = cell.selected and cell.value == 0 and cell.set_initial()
+                    cell.editing = cell.selected and cell.value == 0
 
             elif event.type == pygame.KEYDOWN:
                 if any(cell.editing for cell in grid_sprite):
