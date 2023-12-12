@@ -22,7 +22,8 @@ from random import randint
 WHITE = 0xFFFFFF
 BLACK = 0x000000
 GREY  = 0xeaeef4
-LBLUE = 0x325aaf
+DBLUE = 0x325aaf
+LBLUE = 0xc3dafa
 
 # Setup
 pygame.init()
@@ -44,6 +45,12 @@ initial_nums = [
         [0, 4, 9, 2, 0, 6, 0, 0, 7]
         ]
 
+def get_initial_nums():
+    res = []
+    for i in range(9):
+        for j in range(9):
+            res.append(initial_nums[i][j])
+    return res
 
 class SudokuGrid(pygame.sprite.Sprite):
     def __init__(self, value, row, col, sizeX, sizeY, font):
@@ -56,14 +63,21 @@ class SudokuGrid(pygame.sprite.Sprite):
         self.font = font
         self.selected = False
         self.editing = False
+        self.initial = False
         self.image = pygame.Surface((80, 80))
         self.rect = self.image.get_rect(topleft=(col*80, row*80))
 
+    
+    def set_initial(self):
+        self.initial = True
+
+    def is_initial(self):
+        return self.initial
 
     def update(self):
         if self.selected:
             highlight_rect = pygame.Rect(((self.sizeX // 9)-5, (self.sizeY // 9)-5), (74,74))
-            self.image.fill(LBLUE, highlight_rect)
+            self.image.fill(LBLUE, highlight_rect) 
         else:
             self.image.fill(WHITE)
 
@@ -76,9 +90,13 @@ class SudokuGrid(pygame.sprite.Sprite):
             i+=1
 
         if self.value != 0:
-            text = self.font.render(str(self.value), True, BLACK)
+            text_color = BLACK if self.is_initial() else DBLUE
+            text = self.font.render(str(self.value), True, text_color)
             highlight_rect = pygame.Rect(((self.sizeX // 9)-5, (self.sizeY // 9)-5), (74,74))
-            self.image.fill(GREY, highlight_rect)
+            if not self.is_initial():
+                self.image.fill(GREY, highlight_rect)
+            else:
+                self.image.fill(WHITE, highlight_rect)
             self.image.blit(text, ((self.sizeX // 3) -1, (self.sizeY // 3) -7))
 
 
@@ -88,17 +106,18 @@ def difficulty():
 def create_random_nums() -> list[list]:
     pass
 
-
 def create_grid_sprite() -> pygame.sprite:
     sprites = pygame.sprite.Group()
     for i in range(9):
         for j in range(9):
             cell = SudokuGrid(initial_nums[i][j], i, j, 80, 80, font)
+            if initial_nums[i][j] != 0:
+                cell.set_initial()
             sprites.add(cell)
     return sprites
 
 
-def get_clicked_cell(mouse_x, mouse_y):
+def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
     col = mouse_x // (720 // 9)
     return row, col
@@ -107,6 +126,7 @@ def get_clicked_cell(mouse_x, mouse_y):
 if __name__ == '__main__':
 
     font = pygame.font.SysFont(None, 80)
+    init_font = pygame.font.SysFont(None, 80)
     grid_sprite = create_grid_sprite()
 
     clock = pygame.time.Clock()
@@ -124,7 +144,7 @@ if __name__ == '__main__':
                 # Update cell selection and editing
                 for cell in grid_sprite:
                     cell.selected = (cell.row == selected_row and cell.col == selected_col)
-                    cell.editing = cell.selected and cell.value == 0
+                    cell.editing = cell.selected and cell.value == 0 and cell.set_initial()
 
             elif event.type == pygame.KEYDOWN:
                 if any(cell.editing for cell in grid_sprite):
@@ -143,10 +163,6 @@ if __name__ == '__main__':
         pygame.display.flip()
         
     
-        
-        
-        
-b
         # drivers
         # create_grid_sprite()
         # create_grid()
