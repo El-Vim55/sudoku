@@ -126,7 +126,6 @@ def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
 if __name__ == '__main__':
 
     font = pygame.font.SysFont(None, 80)
-    init_font = pygame.font.SysFont(None, 80)
     grid_sprite = create_grid_sprite()
 
     clock = pygame.time.Clock()
@@ -144,7 +143,7 @@ if __name__ == '__main__':
                 # Update cell selection and editing
                 for cell in grid_sprite:
                     cell.selected = (cell.row == selected_row and cell.col == selected_col)
-                    cell.editing = cell.selected and cell.value == 0
+                    cell.editing = (cell.selected and cell.value == 0) or (cell.selected and not cell.is_initial())
 
             elif event.type == pygame.KEYDOWN:
                 if any(cell.editing for cell in grid_sprite):
