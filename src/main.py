@@ -10,19 +10,21 @@
    - test sprite by allowing highlight feature - DONE
 2. initialize starting nums - DONE
 3. Allow editing of these nums - DONE
-4. Allow re-editing - <-
+4. Allow re-editing - DONE
+5. Create Submit button and implement logic checker to check game - <-
 """
 
 # Libraries
 import pygame
 import error_handling
+import button
 from random import randint
 
 # Constants
 WHITE = 0xFFFFFF
 BLACK = 0x000000
 GREY  = 0xeaeef4
-DBLUE = 0x325aaf
+DBLUE = 0x5a7bc0
 LBLUE = 0xc3dafa
 
 # Setup
@@ -30,6 +32,11 @@ pygame.init()
 pygame.display.set_caption('Sudoku??? ¯\_(ツ)_/¯')
 window_surface = pygame.display.set_mode((750,850))
 window_surface.fill(WHITE)
+
+# Button
+submit_img_unclicked = pygame.image.load('img/submit-bttn.png').convert_alpha()
+submit_img_clicked = pygame.image.load('img/submit-bttn-click.png').convert_alpha()
+submit_bttn = button.Button(766, 566, submit_img_clicked, submit_img_unclicked, 1)
 
 is_running = True
 
@@ -45,29 +52,29 @@ initial_nums = [
         [0, 4, 9, 2, 0, 6, 0, 0, 7]
         ]
 
-def get_initial_nums():
-    res = []
-    for i in range(9):
-        for j in range(9):
-            res.append(initial_nums[i][j])
-    return res
+def difficulty():
+    pass
+
+def create_random_nums() -> list[list]:
+    pass
+
 
 class SudokuGrid(pygame.sprite.Sprite):
     def __init__(self, value, row, col, sizeX, sizeY, font):
         super().__init__()
         self.value = value
-        self.row = row
-        self.col = col
+        self.row   = row
+        self.col   = col
         self.sizeX = sizeX
         self.sizeY = sizeY
-        self.font = font
+        self.font  = font
         self.selected = False
-        self.editing = False
-        self.initial = False
+        self.editing  = False
+        self.initial  = False
         self.image = pygame.Surface((80, 80))
-        self.rect = self.image.get_rect(topleft=(col*80, row*80))
+        self.rect  = self.image.get_rect(topleft=(col*80, row*80))
 
-    
+
     def set_initial(self):
         self.initial = True
 
@@ -75,6 +82,7 @@ class SudokuGrid(pygame.sprite.Sprite):
         return self.initial
 
     def update(self):
+        submit_bttn.operation(self.image)
         if self.selected:
             highlight_rect = pygame.Rect(((self.sizeX // 9)-5, (self.sizeY // 9)-5), (74,74))
             self.image.fill(LBLUE, highlight_rect) 
@@ -100,12 +108,6 @@ class SudokuGrid(pygame.sprite.Sprite):
             self.image.blit(text, ((self.sizeX // 3) -1, (self.sizeY // 3) -7))
 
 
-def difficulty():
-    pass
-
-def create_random_nums() -> list[list]:
-    pass
-
 def create_grid_sprite() -> pygame.sprite:
     sprites = pygame.sprite.Group()
     for i in range(9):
@@ -116,15 +118,14 @@ def create_grid_sprite() -> pygame.sprite:
             sprites.add(cell)
     return sprites
 
-
 def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
     col = mouse_x // (720 // 9)
+    print(row, col)
     return row, col
 
 
 if __name__ == '__main__':
-
     font = pygame.font.SysFont(None, 80)
     grid_sprite = create_grid_sprite()
 
@@ -156,6 +157,7 @@ if __name__ == '__main__':
                                 cell.editing = True
 
         # Refresh the screen
+        submit_bttn.operation(window_surface)
         grid_sprite.update()
         sprites_to_blit = [(sprite.image, sprite.rect) for sprite in grid_sprite]
         window_surface.blits(sprites_to_blit)
@@ -174,7 +176,7 @@ if __name__ == '__main__':
     # i = 1
     # while(i*80) < 720:
     #     if (i * 80) % 3 == 0:
-    #         pygame.draw.line(window_surface, BLACK, pygame.Vector2((i * 80) + 15, 15), pygame.Vector2((i * 80) + 15, 734), 3)
+            # pygame.draw.line(window_surface, BLACK, pygame.Vector2((i * 80) + 15, 15), pygame.Vector2((i * 80) + 15, 734), 3)
     #         pygame.draw.line(window_surface, BLACK, pygame.Vector2(15, (i * 80) + 15), pygame.Vector2(734, (i * 80) +15), 3)
     #     else:
     #         pygame.draw.line(window_surface, BLACK, pygame.Vector2((i * 80) + 15, 15), pygame.Vector2((i * 80) + 15, 734), 1)
