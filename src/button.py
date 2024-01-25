@@ -10,7 +10,6 @@ class Button():
         width = image_unclicked.get_width()
         height = image_unclicked.get_height()
         scaled_size = int(width*scale), int(height*scale)
-
         self.image_clicked = pygame.transform.scale(image_clicked, scaled_size)
         self.image_unclicked = pygame.transform.scale(image_unclicked, scaled_size)
         self.image = image_unclicked

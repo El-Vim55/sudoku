@@ -12,6 +12,7 @@
 3. Allow editing of these nums - DONE
 4. Allow re-editing - DONE
 5. Create Submit button and implement logic checker to check game - <-
+   - Logic checker will be created by checking each column and rows
 """
 
 # Libraries
@@ -36,7 +37,7 @@ window_surface.fill(WHITE)
 # Button
 submit_img_unclicked = pygame.image.load('img/submit-bttn.png').convert_alpha()
 submit_img_clicked = pygame.image.load('img/submit-bttn-click.png').convert_alpha()
-submit_bttn = button.Button(766, 566, submit_img_clicked, submit_img_unclicked, 1)
+submit_bttn = button.Button(525, 750, submit_img_clicked, submit_img_unclicked, 1)
 
 is_running = True
 
@@ -55,9 +56,8 @@ initial_nums = [
 def difficulty():
     pass
 
-def create_random_nums() -> list[list]:
+def create_random_grid() -> list[list]:  # based on difficulty
     pass
-
 
 class SudokuGrid(pygame.sprite.Sprite):
     def __init__(self, value, row, col, sizeX, sizeY, font):
@@ -74,7 +74,6 @@ class SudokuGrid(pygame.sprite.Sprite):
         self.image = pygame.Surface((80, 80))
         self.rect  = self.image.get_rect(topleft=(col*80, row*80))
 
-
     def set_initial(self):
         self.initial = True
 
@@ -82,7 +81,6 @@ class SudokuGrid(pygame.sprite.Sprite):
         return self.initial
 
     def update(self):
-        submit_bttn.operation(self.image)
         if self.selected:
             highlight_rect = pygame.Rect(((self.sizeX // 9)-5, (self.sizeY // 9)-5), (74,74))
             self.image.fill(LBLUE, highlight_rect) 
@@ -107,6 +105,9 @@ class SudokuGrid(pygame.sprite.Sprite):
                 self.image.fill(WHITE, highlight_rect)
             self.image.blit(text, ((self.sizeX // 3) -1, (self.sizeY // 3) -7))
 
+        if submit_bttn.operation(window_surface):
+            pass
+
 
 def create_grid_sprite() -> pygame.sprite:
     sprites = pygame.sprite.Group()
@@ -118,19 +119,22 @@ def create_grid_sprite() -> pygame.sprite:
             sprites.add(cell)
     return sprites
 
+def logic_checker(initial_nums):
+
+    pass
+
+
 def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
     col = mouse_x // (720 // 9)
-    print(row, col)
+    # print(row, col)
     return row, col
 
 
 if __name__ == '__main__':
     font = pygame.font.SysFont(None, 80)
     grid_sprite = create_grid_sprite()
-
     clock = pygame.time.Clock()
-
 
     while is_running:
         for event in pygame.event.get():
@@ -139,13 +143,16 @@ if __name__ == '__main__':
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                selected_row, selected_col = get_clicked_cell(mouse_x, mouse_y)
+                selected_row, selected_col = get_clicked_cell(mouse_x, mouse_y) 
 
                 # Update cell selection and editing
                 for cell in grid_sprite:
                     cell.selected = (cell.row == selected_row and cell.col == selected_col)
                     cell.editing = (cell.selected and cell.value == 0) or (cell.selected and not cell.is_initial())
-
+                    # if cell.editing:
+                    #     x = initial_nums[selected_row][selected_col]
+                    #     print(x)
+                    
             elif event.type == pygame.KEYDOWN:
                 if any(cell.editing for cell in grid_sprite):
                     key = event.unicode
@@ -154,10 +161,18 @@ if __name__ == '__main__':
                         for cell in grid_sprite:
                             if cell.editing:
                                 cell.value = int(key)
+                                initial_nums[cell.row][cell.col] = cell.value
                                 cell.editing = True
 
+
+
+                                # x = initial_nums[selected_row][selected_col]
+                                # y = intial_nums.insert(x, cell.value)
+
+                                # x = int(''.join(map(str, x)))
+                                # y = initial_nums.insert(x, cell.value)
+
         # Refresh the screen
-        submit_bttn.operation(window_surface)
         grid_sprite.update()
         sprites_to_blit = [(sprite.image, sprite.rect) for sprite in grid_sprite]
         window_surface.blits(sprites_to_blit)
