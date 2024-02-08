@@ -12,12 +12,12 @@
 3. Allow editing of these nums - DONE
 4. Allow re-editing - DONE
 5. Create Submit button and implement logic checker to check game - <-
-   - Logic checker will be created by checking each column and rows
+   (15%) - Logic checker will be created by checking each column and rows and each 3x3 grid, also check for duplicates
 """
 
 # Libraries
 import pygame
-import error_handling
+import message_handling
 import button
 from random import randint
 
@@ -41,17 +41,28 @@ submit_bttn = button.Button(525, 750, submit_img_clicked, submit_img_unclicked, 
 
 is_running = True
 
-initial_nums = [
-        [7, 8, 0, 4, 0, 0, 1, 2, 0],
-        [6, 0, 0, 0, 7, 5, 0, 0, 9],
-        [0, 0, 0, 6, 0, 1, 0, 7, 8],
-        [0, 0, 7, 0, 4, 0, 2, 6, 0],
-        [0, 0, 1, 0, 5, 0, 9, 3, 0],
-        [9, 0, 4, 0, 6, 0, 0, 0, 5],
-        [0, 7, 0, 3, 0, 0, 0, 1, 2],
-        [1, 2, 0, 0, 0, 7, 4, 0, 0],
-        [0, 4, 9, 2, 0, 6, 0, 0, 7]
-        ]
+# initial_nums = [
+#         [7, 8, 0, 4, 0, 0, 1, 2, 0],
+#         [6, 0, 0, 0, 7, 5, 0, 0, 9],
+#         [0, 0, 0, 6, 0, 1, 0, 7, 8],
+#         [0, 0, 7, 0, 4, 0, 2, 6, 0],
+#         [0, 0, 1, 0, 5, 0, 9, 3, 0],
+#         [9, 0, 4, 0, 6, 0, 0, 0, 5],
+#         [0, 7, 0, 3, 0, 0, 0, 1, 2],
+#         [1, 2, 0, 0, 0, 7, 4, 0, 0],
+#         [0, 4, 9, 2, 0, 6, 0, 0, 7]
+#         ]
+    
+initial_nums=[
+[7, 5, 1,  8, 4, 3,  9, 2, 6],
+[8, 9, 3,  6, 2, 5,  1, 7, 4], 
+[6, 4, 2,  1, 7, 9,  5, 8, 3],
+[4, 2, 5,  3, 1, 6,  7, 9, 8],
+[1, 7, 6,  9, 8, 2,  3, 4, 5],
+[9, 3, 8,  7, 5, 4,  6, 1, 2],
+[3, 6, 4,  2, 9, 7,  8, 5, 1],
+[2, 8, 9,  5, 3, 1,  4, 6, 7],
+[5, 1, 7,  4, 6, 8,  2, 3, 9]]
 
 def difficulty():
     pass
@@ -106,7 +117,7 @@ class SudokuGrid(pygame.sprite.Sprite):
             self.image.blit(text, ((self.sizeX // 3) -1, (self.sizeY // 3) -7))
 
         if submit_bttn.operation(window_surface):
-            pass
+            logic_checker(initial_nums)
 
 
 def create_grid_sprite() -> pygame.sprite:
@@ -119,14 +130,28 @@ def create_grid_sprite() -> pygame.sprite:
             sprites.add(cell)
     return sprites
 
-def logic_checker(initial_nums):
 
-    pass
+def logic_checker(grid):
+    # row & col checker
+    a = []
+    for row in range(9):
+        if sum(grid[row]) == 45:
+            for col in range(9):
 
+                # a.append(grid[col][row])
+    print(a)
+    
+    # 3x3
+    for row in range(0, 9, 3):
+        for col in range(0, 9, 3):
+            subGrid = sum(grid[row][col:col+3] + grid[row+1][col:col+3] + grid[row+2][col:col+3])
+
+    # print(subGrid)
 
 def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
     col = mouse_x // (720 // 9)
+    print(row//3, col//3)
     # print(row, col)
     return row, col
 
@@ -149,9 +174,6 @@ if __name__ == '__main__':
                 for cell in grid_sprite:
                     cell.selected = (cell.row == selected_row and cell.col == selected_col)
                     cell.editing = (cell.selected and cell.value == 0) or (cell.selected and not cell.is_initial())
-                    # if cell.editing:
-                    #     x = initial_nums[selected_row][selected_col]
-                    #     print(x)
                     
             elif event.type == pygame.KEYDOWN:
                 if any(cell.editing for cell in grid_sprite):
@@ -162,15 +184,9 @@ if __name__ == '__main__':
                             if cell.editing:
                                 cell.value = int(key)
                                 initial_nums[cell.row][cell.col] = cell.value
+                                # logic_checker(initial_nums)
                                 cell.editing = True
 
-
-
-                                # x = initial_nums[selected_row][selected_col]
-                                # y = intial_nums.insert(x, cell.value)
-
-                                # x = int(''.join(map(str, x)))
-                                # y = initial_nums.insert(x, cell.value)
 
         # Refresh the screen
         grid_sprite.update()
