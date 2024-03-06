@@ -54,7 +54,7 @@ is_running = True
 #         ]
     
 initial_nums=[
-[7, 5, 1,  8, 4, 3,  9, 2, 6],
+[7, 5, 1,  8, 2, 3,  9, 2, 6],
 [8, 9, 3,  6, 2, 5,  1, 7, 4], 
 [6, 4, 2,  1, 7, 9,  5, 8, 3],
 [4, 2, 5,  3, 1, 6,  7, 9, 8],
@@ -132,15 +132,22 @@ def create_grid_sprite() -> pygame.sprite:
 
 
 def logic_checker(grid):
-    # row & col checker
-    a = []
+    # 9x9
+    res = []
     for row in range(9):
-        if sum(grid[row]) == 45:
-            for col in range(9):
+        row_values = sum(grid[row])
+        # if row_values != 45:
+        #     print("wrong values")
+        column = []
+        for col in range(9):
+            column.append(grid[col][row])
+        res.append(column)
 
-                # a.append(grid[col][row])
-    print(a)
-    
+    for column_values in res:
+        column_values = sum(column_values)
+        if column_values != 45:
+            print('not equal')
+
     # 3x3
     for row in range(0, 9, 3):
         for col in range(0, 9, 3):
@@ -151,7 +158,7 @@ def logic_checker(grid):
 def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
     col = mouse_x // (720 // 9)
-    print(row//3, col//3)
+    print(row, col)
     # print(row, col)
     return row, col
 
@@ -184,7 +191,6 @@ if __name__ == '__main__':
                             if cell.editing:
                                 cell.value = int(key)
                                 initial_nums[cell.row][cell.col] = cell.value
-                                # logic_checker(initial_nums)
                                 cell.editing = True
 
 
