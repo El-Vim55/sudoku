@@ -42,28 +42,28 @@ submit_bttn = button.Button(525, 750, submit_img_clicked, submit_img_unclicked, 
 
 is_running = True
 
-# initial_nums = [
-#         [7, 8, 0, 4, 0, 0, 1, 2, 0],
-#         [6, 0, 0, 0, 7, 5, 0, 0, 9],
-#         [0, 0, 0, 6, 0, 1, 0, 7, 8],
-#         [0, 0, 7, 0, 4, 0, 2, 6, 0],
-#         [0, 0, 1, 0, 5, 0, 9, 3, 0],
-#         [9, 0, 4, 0, 6, 0, 0, 0, 5],
-#         [0, 7, 0, 3, 0, 0, 0, 1, 2],
-#         [1, 2, 0, 0, 0, 7, 4, 0, 0],
-#         [0, 4, 9, 2, 0, 6, 0, 0, 7]
-#         ]
+initial_nums = [
+        [7, 8, 0, 4, 0, 0, 1, 2, 0],
+        [6, 0, 0, 0, 7, 5, 0, 0, 9],
+        [0, 0, 0, 6, 0, 1, 0, 7, 8],
+        [0, 0, 7, 0, 4, 0, 2, 6, 0],
+        [0, 0, 1, 0, 5, 0, 9, 3, 0],
+        [9, 0, 4, 0, 6, 0, 0, 0, 5],
+        [0, 7, 0, 3, 0, 0, 0, 1, 2],
+        [1, 2, 0, 0, 0, 7, 4, 0, 0],
+        [0, 4, 9, 2, 0, 6, 0, 0, 7]
+        ]
     
-initial_nums=[
-[7, 5, 1,  8, 8, 3,  9, 2, 6],
-[8, 9, 3,  6, 2, 5,  1, 7, 4], 
-[6, 4, 2,  1, 7, 9,  5, 8, 3],
-[4, 2, 5,  3, 1, 6,  7, 9, 8],
-[1, 7, 6,  9, 8, 2,  3, 4, 5],
-[9, 3, 8,  7, 5, 4,  6, 1, 2],
-[3, 6, 4,  2, 9, 7,  8, 5, 1],
-[2, 8, 9,  5, 3, 1,  4, 6, 7],
-[5, 1, 7,  4, 6, 8,  2, 3, 9]]
+# initial_nums=[
+# [7, 5, 1,  8, 0, 3,  9, 2, 6],
+# [8, 9, 3,  6, 2, 5,  1, 7, 4], 
+# [6, 4, 2,  1, 7, 9,  5, 8, 3],
+# [4, 2, 5,  3, 1, 6,  7, 9, 8],
+# [1, 7, 6,  9, 8, 2,  3, 4, 5],
+# [9, 3, 8,  7, 5, 4,  6, 1, 2],
+# [3, 6, 4,  2, 9, 7,  8, 5, 1],
+# [2, 8, 9,  5, 3, 1,  4, 6, 7],
+# [5, 1, 7,  4, 6, 8,  2, 3, 9]]
 
 def difficulty():
     pass
@@ -121,6 +121,7 @@ class SudokuGrid(pygame.sprite.Sprite):
         # if submit_bttn.operation(window_surface):
         #     logic_checker(initial_nums)
 
+
 def create_grid_sprite() -> pygame.sprite:
     sprites = pygame.sprite.Group()
     for i in range(9):
@@ -132,7 +133,6 @@ def create_grid_sprite() -> pygame.sprite:
     return sprites
 
 run_logic_checker = False
-run_thread = False
 
 def logic_checker(grid):
     # 9x9
@@ -140,12 +140,16 @@ def logic_checker(grid):
     for row in range(9):
         row_values = grid[row]
         dup_val = set(row_values)
-        if len(dup_val) < 9: 
-            mh.duplicate_value()
+        if 0 in row_values and errors == 0:
+            mh.incomplete_grid()
             errors = 1
-        elif sum(row_values) != 45:
-            print('wrong')
-            errors = 1
+        elif errors == 0:
+            # if len(dup_val) < 9: 
+                # mh.duplicate_value()
+                # errors = 1
+            if sum(row_values) != 45:
+                mh.incorrect_values()
+                errors = 1
 
         res = []
         column = []
@@ -155,27 +159,35 @@ def logic_checker(grid):
 
     for column_values in res:
         dup_val = set(column_values)
-        if len(dup_val) < 9:
-            print("Duplicate!")
+        if 0 in column_values and errors == 0:
+            mh.incomplete_grid()
             errors = 1
-        elif sum(column_values) != 45:
-            print('not equal')
-            errors = 1
+        elif errors == 0:
+            # if len(dup_val) < 9:
+                # mh.duplicate_value()
+                # errors = 1
+            if sum(column_values) != 45:
+                mh.incorrect_values()
+                errors = 1
 
     # 3x3
     for row in range(0, 9, 3):
         for col in range(0, 9, 3):
             subGrid = grid[row][col:col+3] + grid[row+1][col:col+3] + grid[row+2][col:col+3]
             dup_val = set(subGrid)
-            if len(dup_val) < 9:
-                print("dup")
+            if 0 in subGrid and errors == 0:
+                mh.incomplete_grid()
                 errors = 1
-            elif sum(subGrid) != 45:
-                print('wrong')
-                errors = 1
+            elif errors == 0:
+                # if len(dup_val) < 9:
+                    # mh.duplicate_value()
+                    # errors = 1
+                if sum(subGrid) != 45:
+                    mh.duplicate_value()
+                    errors = 1
     
     if errors == 0:
-        print('you win')
+        mh.win_screen()
 
 
 def run_logic_checker_thread():
