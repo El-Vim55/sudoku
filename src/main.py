@@ -17,11 +17,12 @@
 
 # Libraries
 import pygame
-import message_handling
+import message_handling as mh
 import button
+import threading
 from random import randint
 
-# Constants
+# Colours
 WHITE = 0xFFFFFF
 BLACK = 0x000000
 GREY  = 0xeaeef4
@@ -116,9 +117,9 @@ class SudokuGrid(pygame.sprite.Sprite):
                 self.image.fill(WHITE, highlight_rect)
             self.image.blit(text, ((self.sizeX // 3) -1, (self.sizeY // 3) -7))
 
-        if submit_bttn.operation(window_surface):
-            logic_checker(initial_nums)
-
+        submit_bttn.operation(window_surface)
+        # if submit_bttn.operation(window_surface):
+        #     logic_checker(initial_nums)
 
 def create_grid_sprite() -> pygame.sprite:
     sprites = pygame.sprite.Group()
@@ -130,19 +131,23 @@ def create_grid_sprite() -> pygame.sprite:
             sprites.add(cell)
     return sprites
 
+run_logic_checker = False
+run_thread = False
 
 def logic_checker(grid):
     # 9x9
-    res = []
+    errors = 0
     for row in range(9):
         row_values = grid[row]
         dup_val = set(row_values)
-        if len(dup_val) < 9:
-            print("duplicate!")
-        
+        if len(dup_val) < 9: 
+            mh.duplicate_value()
+            errors = 1
         elif sum(row_values) != 45:
             print('wrong')
+            errors = 1
 
+        res = []
         column = []
         for col in range(9):
             column.append(grid[col][row])
@@ -152,9 +157,10 @@ def logic_checker(grid):
         dup_val = set(column_values)
         if len(dup_val) < 9:
             print("Duplicate!")
-
+            errors = 1
         elif sum(column_values) != 45:
             print('not equal')
+            errors = 1
 
     # 3x3
     for row in range(0, 9, 3):
@@ -163,12 +169,24 @@ def logic_checker(grid):
             dup_val = set(subGrid)
             if len(dup_val) < 9:
                 print("dup")
-            
+                errors = 1
             elif sum(subGrid) != 45:
                 print('wrong')
+                errors = 1
     
-    
+    if errors == 0:
+        print('you win')
 
+
+def run_logic_checker_thread():
+    global run_logic_checker
+    while True:
+        if run_logic_checker:
+            logic_checker(initial_nums)
+            run_logic_checker = False
+
+logic_checker_thread = threading.Thread(target=run_logic_checker_thread, daemon=True)
+logic_checker_thread.start()
 
 def get_clicked_cell(mouse_x, mouse_y) -> (int, int):
     row = mouse_y // (720 // 9)
@@ -190,7 +208,9 @@ if __name__ == '__main__':
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                selected_row, selected_col = get_clicked_cell(mouse_x, mouse_y) 
+                selected_row, selected_col = get_clicked_cell(mouse_x, mouse_y)
+                if submit_bttn.operation(window_surface):
+                    run_logic_checker = True
 
                 # Update cell selection and editing
                 for cell in grid_sprite:
