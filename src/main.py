@@ -11,15 +11,18 @@
 2. initialize starting nums - DONE
 3. Allow editing of these nums - DONE
 4. Allow re-editing - DONE
-5. Create Submit button and implement logic checker to check game - <-
-   (15%) - Logic checker will be created by checking each column and rows and each 3x3 grid, also check for duplicates
+5. Create Submit button and implement logic checker to check game - DONE
+   (95%) - Logic checker will be created by checking each column and rows and each 3x3 grid, also check for duplicates 
+6. Create a menu in which I will be able to choose the difficulty of the game
+        - This is where the difficuly will take into play, alongside the number generator
+7. Allow the random generation of numbers in the grid
 """
 
 # Libraries
 import pygame
-import message_handling as mh
 import button
 import threading
+import message_handling as mh
 from random import randint
 
 # Colours
@@ -42,18 +45,18 @@ submit_bttn = button.Button(525, 750, submit_img_clicked, submit_img_unclicked, 
 
 is_running = True
 
-initial_nums = [
-        [7, 8, 0, 4, 0, 0, 1, 2, 0],
-        [6, 0, 0, 0, 7, 5, 0, 0, 9],
-        [0, 0, 0, 6, 0, 1, 0, 7, 8],
-        [0, 0, 7, 0, 4, 0, 2, 6, 0],
-        [0, 0, 1, 0, 5, 0, 9, 3, 0],
-        [9, 0, 4, 0, 6, 0, 0, 0, 5],
-        [0, 7, 0, 3, 0, 0, 0, 1, 2],
-        [1, 2, 0, 0, 0, 7, 4, 0, 0],
-        [0, 4, 9, 2, 0, 6, 0, 0, 7]
-        ]
-    
+# initial_nums = [
+#         [7, 8, 0, 4, 0, 0, 1, 2, 0],
+#         [6, 0, 0, 0, 7, 5, 0, 0, 9],
+#         [0, 0, 0, 6, 0, 1, 0, 7, 8],
+#         [0, 0, 7, 0, 4, 0, 2, 6, 0],
+#         [0, 0, 1, 0, 5, 0, 9, 3, 0],
+#         [9, 0, 4, 0, 6, 0, 0, 0, 5],
+#         [0, 7, 0, 3, 0, 0, 0, 1, 2],
+#         [1, 2, 0, 0, 0, 7, 4, 0, 0],
+#         [0, 4, 9, 2, 0, 6, 0, 0, 7]
+#         ]
+
 # initial_nums=[
 # [7, 5, 1,  8, 0, 3,  9, 2, 6],
 # [8, 9, 3,  6, 2, 5,  1, 7, 4], 
@@ -65,11 +68,29 @@ initial_nums = [
 # [2, 8, 9,  5, 3, 1,  4, 6, 7],
 # [5, 1, 7,  4, 6, 8,  2, 3, 9]]
 
+initial_nums=[
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0], 
+[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+
 def difficulty():
     pass
 
-def create_random_grid() -> list[list]:  # based on difficulty
-    pass
+def create_random_grid(grid) -> list[list]:  # based on difficulty
+    # starts diagonally
+    for row in range(0, 9, 3):
+        for col in range(0, 9, 3):
+            subGrid = grid[row][col:col+3] + grid[row+1][col:col+3] + grid[row+2][col:col+3]
+            
+
+create_random_grid(initial_nums)
 
 class SudokuGrid(pygame.sprite.Sprite):
     def __init__(self, value, row, col, sizeX, sizeY, font):
@@ -93,6 +114,7 @@ class SudokuGrid(pygame.sprite.Sprite):
         return self.initial
 
     def update(self):
+        # create_random_grid()
         if self.selected:
             highlight_rect = pygame.Rect(((self.sizeX // 9)-5, (self.sizeY // 9)-5), (74,74))
             self.image.fill(LBLUE, highlight_rect) 
@@ -188,7 +210,6 @@ def logic_checker(grid):
     
     if errors == 0:
         mh.win_screen()
-
 
 def run_logic_checker_thread():
     global run_logic_checker

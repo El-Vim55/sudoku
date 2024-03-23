@@ -22,5 +22,5 @@ def duplicate_value():
 def incorrect_values():
     root = tk.Tk()
     root.withdraw()
-    messagebox.showwarning('', 'Incorrect Value!')
+    messagebox.showwarning('', 'Incorrect Value(s)!')
     root.destroy()
